@@ -1,2 +1,2 @@
-# nanobyte
-An Express microservice to expose the nanobyte npm package via RPC
+# nanoutils
+Business logic to abstract the raw nano node RPC logic
