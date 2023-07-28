@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "nanoutils"
+name = "nanohelp"
 version = "0.0.1"
 description = "Business logic to abstract the raw nano node RPC logic"
 authors = ["Nate Schultz <nate.schultz@outlook.com>"]
 readme = "README.md"
-packages = [{include = "nanoutils"}]
+packages = [{include = "nanohelp"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"

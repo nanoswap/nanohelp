@@ -42,7 +42,7 @@ def lint(session: nox.Session) -> None:
 
     # lint the source code
     session.run(
-        'flake8', 'nanoutils',
+        'flake8', 'nanohelp',
         '--docstring-convention', 'google',
         '--ignore=D100,D104',
     )

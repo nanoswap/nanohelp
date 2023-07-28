@@ -1,6 +1,6 @@
 # BasicNanoClient
 
-::: nanoutils.wallet.WalletManager
+::: nanohelp.wallet.WalletManager
     handler: python
     options:
       members:

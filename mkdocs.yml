@@ -1,5 +1,5 @@
-site_name: "nanoutils"
-repo_url: https://github.com/nanoswap/nanoutils
+site_name: "nanohelp"
+repo_url: https://github.com/nanoswap/nanohelp
 edit_uri: blob/main/docs/
 
 nav:
