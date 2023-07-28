@@ -1,14 +1,14 @@
 import unittest
 from unittest.mock import MagicMock
 
-from wallet import Wallet
+from wallet import WalletManager
 
 
 class TestWallet(unittest.TestCase):
     def setUp(self):
         # Replace the Nano RPC client with a mock object
         self.node_address = 'http://localhost:7076'
-        self.wallet_manager = Wallet(self.node_address)
+        self.wallet_manager = WalletManager(self.node_address)
         self.wallet_manager.client = MagicMock()
 
     def test_create_wallet(self):

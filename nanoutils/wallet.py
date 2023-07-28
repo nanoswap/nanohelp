@@ -1,7 +1,7 @@
 from basicnanoclient import BasicNanoClient
 import time
 
-class Wallet:
+class WalletManager:
     def __init__(self, node_address):
         self.client = BasicNanoClient(node_address)
         self.transaction_history = {}
@@ -74,6 +74,7 @@ class Wallet:
 
         except Exception as e:
             print(f"Transaction failed: {e}")
+            # TODO: redo retry to use decorator
             return self.make_transaction(source_wallet, source_account, destination_account, amount, private_key, retries-1)
 
     def get_transaction_history(self, account):
