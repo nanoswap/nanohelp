@@ -1,10 +1,9 @@
-import basicnanoclient
+from basicnanoclient import BasicNanoClient
 import time
-
 
 class Wallet:
     def __init__(self, node_address):
-        self.client = nanorpc.Client(node_address)
+        self.client = BasicNanoClient(node_address)
         self.transaction_history = {}
 
     def create_wallet(self):
@@ -14,8 +13,9 @@ class Wallet:
         Returns: a tuple containing wallet_id and account_address
         """
         try:
-            wallet_id = self.client.wallet_create()
-            account_address = self.client.wallet_add(wallet_id)
+            private_key = self.client.generate_private_key()
+            wallet_id = self.client.wallet_create(private_key)['wallet']
+            account_address = self.client.accounts_create(wallet_id)['accounts'][0]
         except Exception as e:
             print(f"Failed to create wallet: {e}")
             return None
@@ -27,17 +27,17 @@ class Wallet:
         Add a new account to an existing wallet.
         """
         try:
-            account_address = self.client.wallet_add(wallet_id)
+            account_address = self.client.accounts_create(wallet_id)['accounts'][0]
         except Exception as e:
             print(f"Failed to add account to wallet {wallet_id}: {e}")
             return None
-        
+
         return account_address
 
     def make_transaction(self, source_wallet, source_account, destination_account, amount, retries=3):
         """
         This method abstracts the process of making a transaction.
-        
+
         Params:
             - source_wallet: the wallet id of the source account
             - source_account: the address of the source account
@@ -51,21 +51,18 @@ class Wallet:
             raise ValueError("Transaction failed after multiple retries")
 
         try:
-            # Ensure the source account belongs to the source wallet
-            if not self.client.wallet_contains(source_wallet, source_account):
+            account_list = self.client.account_list(source_wallet)['accounts']
+            if source_account not in account_list:
                 raise ValueError(f"Account {source_account} doesn't belong to wallet {source_wallet}")
 
             # Check if the account has enough balance
-            balance = self.client.account_balance(source_account)
-            if balance < amount:
+            balance = self.client.account_info(source_account)['balance']
+            if int(balance) < amount:
                 raise ValueError(f"Account {source_account} has insufficient balance")
 
             # Make the transaction
-            block = self.client.send(source_wallet, source_account, destination_account, amount)
-
-            # Wait for the transaction to be confirmed
-            while not self.client.block_confirm(block):
-                time.sleep(1)
+            transaction = self.client.send(source_wallet, source_account, destination_account, amount)
+            block = transaction.get('block')
 
             # Update transaction history
             if source_account not in self.transaction_history:
