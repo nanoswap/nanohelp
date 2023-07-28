@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nanohelp"
-version = "0.0.1"
+version = "0.0.2"
 description = "Business logic to abstract the raw nano node RPC logic"
 authors = ["Nate Schultz <nate.schultz@outlook.com>"]
 readme = "README.md"
