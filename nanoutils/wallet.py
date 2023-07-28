@@ -10,7 +10,7 @@ class Wallet:
         """
         This method abstracts the process of creating a new wallet.
 
-        Returns: a tuple containing wallet_id and account_address
+        Returns: a tuple containing wallet_id, account_address and private_key
         """
         try:
             private_key = self.client.generate_private_key()
@@ -20,7 +20,7 @@ class Wallet:
             print(f"Failed to create wallet: {e}")
             return None
 
-        return wallet_id, account_address
+        return wallet_id, account_address, private_key
 
     def add_account_to_wallet(self, wallet_id):
         """
@@ -34,7 +34,7 @@ class Wallet:
 
         return account_address
 
-    def make_transaction(self, source_wallet, source_account, destination_account, amount, retries=3):
+    def make_transaction(self, source_wallet, source_account, destination_account, amount, private_key, retries=3):
         """
         This method abstracts the process of making a transaction.
 
@@ -43,6 +43,7 @@ class Wallet:
             - source_account: the address of the source account
             - destination_account: the address of the destination account
             - amount: the amount of Nano to be sent
+            - private_key: the private key of the source account
             - retries: the number of times to retry the transaction in case of failure
 
         Returns: the transaction block
@@ -61,7 +62,7 @@ class Wallet:
                 raise ValueError(f"Account {source_account} has insufficient balance")
 
             # Make the transaction
-            transaction = self.client.send(source_wallet, source_account, destination_account, amount)
+            transaction = self.client.send(source_wallet, source_account, destination_account, amount, private_key)
             block = transaction.get('block')
 
             # Update transaction history
@@ -73,7 +74,7 @@ class Wallet:
 
         except Exception as e:
             print(f"Transaction failed: {e}")
-            return self.make_transaction(source_wallet, source_account, destination_account, amount, retries-1)
+            return self.make_transaction(source_wallet, source_account, destination_account, amount, private_key, retries-1)
 
     def get_transaction_history(self, account):
         """
