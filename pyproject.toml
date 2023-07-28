@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "nanoutils"
+version = "0.0.1"
+description = "Business logic to abstract the raw nano node RPC logic"
+authors = ["Nate Schultz <nate.schultz@outlook.com>"]
+readme = "README.md"
+packages = [{include = "nanoutils"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+protobuf = "^4.22.3"
+pandas = "^2.0.0"
+py-multicodec = "^0.2.1"
+requests = "^2.28.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

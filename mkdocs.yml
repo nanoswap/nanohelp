@@ -1,0 +1,21 @@
+site_name: "nanoutils"
+repo_url: https://github.com/nanoswap/nanoutils
+edit_uri: blob/main/docs/
+
+nav:
+  - Home: 'index.md'
+  - Classes:
+      - 'Transaction': 'classes_transaction.md'
+      - 'Wallet': 'classes_wallet.md'
+  - About:
+      - 'License': 'LICENSE.md'
+
+theme:
+  name: "readthedocs"
+
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        paths: [.]  # actually not needed, default
