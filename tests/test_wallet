@@ -1,0 +1,52 @@
+import unittest
+from unittest.mock import MagicMock
+
+from wallet import Wallet
+
+
+class TestWallet(unittest.TestCase):
+    def setUp(self):
+        # Replace the Nano RPC client with a mock object
+        self.node_address = 'http://localhost:7076'
+        self.wallet_manager = Wallet(self.node_address)
+        self.wallet_manager.client = MagicMock()
+
+    def test_create_wallet(self):
+        # Arrange
+        expected_wallet_id = 'wallet_id'
+        expected_account_address = 'account_address'
+        self.wallet_manager.client.wallet_create.return_value = expected_wallet_id
+        self.wallet_manager.client.wallet_add.return_value = expected_account_address
+
+        # Act
+        result = self.wallet_manager.create_wallet()
+
+        # Assert
+        self.wallet_manager.client.wallet_create.assert_called_once()
+        self.wallet_manager.client.wallet_add.assert_called_once_with(expected_wallet_id)
+        self.assertEqual(result, (expected_wallet_id, expected_account_address))
+
+    def test_add_account_to_wallet(self):
+        # Arrange
+        expected_wallet_id = 'wallet_id'
+        expected_account_address = 'account_address'
+        self.wallet_manager.client.wallet_add.return_value = expected_account_address
+
+        # Act
+        result = self.wallet_manager.add_account_to_wallet(expected_wallet_id)
+
+        # Assert
+        self.wallet_manager.client.wallet_add.assert_called_once_with(expected_wallet_id)
+        self.assertEqual(result, expected_account_address)
+
+    def test_get_transaction_history(self):
+        # Arrange
+        account = 'account_address'
+        expected_history = [('destination_account', 10, 'block')]
+        self.wallet_manager.transaction_history[account] = expected_history
+
+        # Act
+        result = self.wallet_manager.get_transaction_history(account)
+
+        # Assert
+        self.assertEqual(result, expected_history)
