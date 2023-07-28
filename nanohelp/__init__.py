@@ -5,4 +5,4 @@ from __future__ import annotations
 from nanohelp.wallet import WalletManager
 
 # imported into setup.py
-__version__ = "0.0.2"
+__version__ = "0.0.6"

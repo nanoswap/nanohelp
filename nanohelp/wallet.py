@@ -1,4 +1,4 @@
-from basicnanoclient import BasicNanoClient
+from basicnanoclient.nano import BasicNanoClient
 import time
 
 class WalletManager:
