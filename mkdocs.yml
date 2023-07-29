@@ -5,7 +5,6 @@ edit_uri: blob/main/docs/
 nav:
   - Home: 'index.md'
   - Classes:
-      - 'Transaction': 'classes_transaction.md'
       - 'Wallet': 'classes_wallet.md'
   - About:
       - 'License': 'LICENSE.md'

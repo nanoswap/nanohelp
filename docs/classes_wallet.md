@@ -8,6 +8,5 @@
         - create_wallet
         - add_account_to_wallet
         - make_transaction
-        - get_transaction_history
       show_root_heading: true
       show_source: true

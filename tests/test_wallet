@@ -38,15 +38,3 @@ class TestWallet(unittest.TestCase):
         # Assert
         self.wallet_manager.client.wallet_add.assert_called_once_with(expected_wallet_id)
         self.assertEqual(result, expected_account_address)
-
-    def test_get_transaction_history(self):
-        # Arrange
-        account = 'account_address'
-        expected_history = [('destination_account', 10, 'block')]
-        self.wallet_manager.transaction_history[account] = expected_history
-
-        # Act
-        result = self.wallet_manager.get_transaction_history(account)
-
-        # Assert
-        self.assertEqual(result, expected_history)
