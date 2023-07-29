@@ -23,24 +23,28 @@ class SecretManager:
         return secrets.token_hex(32)  # 32 bytes = 64 hexadecimal characters
 
 
-    def generate_and_store_private_key(self: Self, user: str) -> str:
+    def generate_and_store_private_key(
+            self: Self,
+            project: str,
+            name: str) -> str:
         """This method generates a private key and stores it in Google Secret Manager.
 
         Params:
-            - user: the user to store the private key for
+            - project: the project to store the secret in
+            - name: the secret name to store the private key for
 
         Raises:
             - RuntimeError: If unable to store the secret.
         """
         private_key = self.generate_private_key()
-        self.store_private_key(user, private_key)
+        self.store_private_key(project, name, private_key)
         return private_key
 
     def store_private_key(
             self: Self,
             project: str,
             name: str,
-            private_key: str,):
+            private_key: str) -> None:
         """Storing a private key based on a index in Google Secret Manager.
 
         Params:
@@ -90,7 +94,11 @@ class SecretManager:
         """
         try:
             # Build the resource name of the secret version.
-            name = self.secret_manager_client.secret_version_path(project, name, version)
+            name = self.secret_manager_client.secret_version_path(
+                project,
+                name,
+                version
+            )
 
             # Access the secret version.
             response = self.secret_manager_client.access_secret_version(name)
@@ -104,7 +112,11 @@ class SecretManager:
             LOG.exception(e)
             raise RuntimeError("Unable to retrieve secret: {}".format(e)) from e
 
-    def rotate_private_key(self: Self, name: str):
+    def rotate_private_key(
+            self: Self,
+            project: str,
+            name: str,
+            new_key: str) -> None:
         """Rotate a private key, replacing it with a new version.
 
         **Caution**: the old private key will be lost, and if it is used for
@@ -114,7 +126,9 @@ class SecretManager:
         effectively replacing the old one.
 
         Params:
-            - name: the name of the secret to rotate the private key for
+            - project: the project to store the secret in
+            - name: the name of the secret
+            - new_key: the new private key to store
 
         Returns:
             - The new private key that was generated.
@@ -126,6 +140,6 @@ class SecretManager:
 
         try:
             # Generate and store a new private key
-            return self.generate_and_store_private_key(name)
+            return self.generate_and_store_private_key(project, name, new_key)
         except Exception as e:
             raise RuntimeError(f"Unable to rotate private key: {e}") from e
