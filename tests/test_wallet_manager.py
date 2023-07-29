@@ -15,7 +15,7 @@ class TestWalletManager(unittest.TestCase):
         self.secret_manager.generate_and_store_private_key.return_value = 'mock_key'
         self.client.wallet_create.return_value = {'wallet': 'mock_wallet'}
         self.client.accounts_create.return_value = {'accounts': ['mock_account']}
-        result = self.wallet_manager.create_wallet('mock_name')
+        result = self.wallet_manager.create_wallet('mock_project', 'mock_name')
         self.assertEqual(result, ('mock_wallet', 'mock_account'))
 
     def test_add_account_to_wallet(self):

@@ -28,17 +28,18 @@ class WalletManager:
         self.client = BasicNanoClient(node_address)
         self.secret_manager = secret_manager
 
-    def create_wallet(self: Self, name: str) -> Optional[Tuple[str, str]]:
+    def create_wallet(self: Self, project: str, name: str) -> Optional[Tuple[str, str]]:
         """Generate a new private key and create a new wallet.
 
         Params:
+            - project: the project to store the secret in
             - name: the name of the wallet to create
 
         Returns: a tuple containing wallet_id and account_address
         """
         try:
             wallet_id = self.client.wallet_create(
-                self.secret_manager.generate_and_store_private_key(name)
+                self.secret_manager.generate_and_store_private_key(project, name)
             )['wallet']
             account_address = self.client.accounts_create(wallet_id)['accounts'][0]
         except Exception as e:
