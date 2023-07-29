@@ -139,23 +139,21 @@ class SecretManager:
             parent = f"projects/{project}"
 
             # Check if the secret exists
-            secrets = self.secret_manager_client.list_secrets(
-                request=secretmanager.ListSecretsRequest(parent=parent)
-            )
-
-            if name not in [secret.secret_id for secret in secrets]:
+            if name not in [
+                secret.name for secret in
+                self.secret_manager_client.list_secrets(
+                    request=secretmanager.ListSecretsRequest(parent=parent)
+                )
+            ]:
                 # If the secret doesn't exist, create it
                 self.create_secret(project, name)
 
-            # Create a new secret version
-            secret = self.secret_manager_client.secret_path(
-                project,
-                name,
-            )
-
             # Add the secret version
             self.secret_manager_client.add_secret_version(
-                parent=secret,
+                parent=self.secret_manager_client.secret_path(
+                    project,
+                    name,
+                ),
                 payload=secretmanager.SecretPayload(
                     data=private_key.encode('UTF-8')
                 )
