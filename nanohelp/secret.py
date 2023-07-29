@@ -137,10 +137,13 @@ class SecretManager:
         try:
             # Define the parent project
             parent = f"projects/{project}"
-            
+
             # Check if the secret exists
-            secrets = self.secret_manager_client.list_secrets(parent)
-            if name not in [secret.name for secret in secrets]:
+            secrets = self.secret_manager_client.list_secrets(
+                request=secretmanager.ListSecretsRequest(parent=parent)
+            )
+
+            if name not in [secret.secret_id for secret in secrets]:
                 # If the secret doesn't exist, create it
                 self.create_secret(project, name)
 
