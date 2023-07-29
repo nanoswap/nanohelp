@@ -6,4 +6,4 @@ from nanohelp.wallet import WalletManager
 from nanohelp.secret import SecretManager
 
 # imported into setup.py
-__version__ = "0.1.3"
+__version__ = "0.1.6"

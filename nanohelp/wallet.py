@@ -1,11 +1,12 @@
 from basicnanoclient.nano import BasicNanoClient
 from typing import List, Tuple, Optional, Self
 import logging
+import os
 
 from nanohelp.secret import SecretManager
 
 LOG = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class WalletManager:
@@ -26,6 +27,7 @@ class WalletManager:
 
         """
         self.client = BasicNanoClient(node_address)
+        LOG.debug("Google Application Credentials: %s", os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
         self.secret_manager = secret_manager
 
     def create_wallet(self: Self, project: str, name: str) -> Optional[Tuple[str, str]]:

@@ -3,6 +3,9 @@ import time
 import secrets
 from google.cloud import secretmanager
 import logging
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -12,6 +15,12 @@ class SecretManager:
     """Class to handle operations related to Google Cloud Secret Manager."""
 
     def __init__(self: Self):
+        """Initialize the secret manager.
+
+        The GOOGLE_APPLICATION_CREDENTIALS environment variable must be set to
+        the path to the service account key file (for google secret manager)
+        """
+        load_dotenv(Path(os.environ['SECRETS_PATH'] + "/.env.nanoswap"))
         self.secret_manager_client = secretmanager.SecretManagerServiceClient()
 
     def generate_private_key(self: Self) -> str:
@@ -39,40 +48,6 @@ class SecretManager:
         private_key = self.generate_private_key()
         self.store_private_key(project, name, private_key)
         return private_key
-
-    def store_private_key(
-            self: Self,
-            project: str,
-            name: str,
-            private_key: str) -> None:
-        """Storing a private key based on a index in Google Secret Manager.
-
-        Params:
-            - project: the project to store the secret in
-            - name: the name of the secret
-            - private_key: the private key to store
-
-        Raises:
-            - RuntimeError: If unable to store the secret.
-        """
-        try:
-            # Create a new secret version
-            secret = self.secret_manager_client.secret_path(
-                project,
-                name,
-            )
-
-            # Add the secret version
-            self.secret_manager_client.add_secret_version(
-                parent=secret,
-                payload=secretmanager.SecretPayload(
-                    data=private_key.encode('UTF-8')
-                )
-            )
-        except Exception as e:
-            LOG.error(f"Failed to store private key for {name}: {e}")
-            LOG.exception(e)
-            raise RuntimeError("Unable to store secret: {}".format(e)) from e
 
     def get_private_key(
             self: Self,
@@ -111,6 +86,81 @@ class SecretManager:
             LOG.error(f"Failed to retrieve private key for {name}: {e}")
             LOG.exception(e)
             raise RuntimeError("Unable to retrieve secret: {}".format(e)) from e
+
+    def create_secret(
+            self: Self,
+            project: str,
+            name: str) -> None:
+        """Create a new secret.
+
+        Params:
+            - project: the project to create the secret in
+            - name: the name of the secret
+
+        Raises:
+            - RuntimeError: If unable to create the secret.
+        """
+        try:
+            # Define the parent project
+            parent = f"projects/{project}"
+
+            # Create a new secret
+            response = self.secret_manager_client.create_secret(
+                parent=parent,
+                secret_id=name,
+                secret=secretmanager.Secret(
+                    replication=secretmanager.Replication(
+                        automatic=secretmanager.Replication.Automatic()
+                    )
+                ),
+            )
+        except Exception as e:
+            LOG.error(f"Failed to create secret {name}: {e}")
+            LOG.exception(e)
+            raise RuntimeError("Unable to create secret: {}".format(e)) from e
+
+    def store_private_key(
+            self: Self,
+            project: str,
+            name: str,
+            private_key: str) -> None:
+        """Storing a private key based on a index in Google Secret Manager.
+
+        Params:
+            - project: the project to store the secret in
+            - name: the name of the secret
+            - private_key: the private key to store
+
+        Raises:
+            - RuntimeError: If unable to store the secret.
+        """
+        try:
+            # Define the parent project
+            parent = f"projects/{project}"
+            
+            # Check if the secret exists
+            secrets = self.secret_manager_client.list_secrets(parent)
+            if name not in [secret.name for secret in secrets]:
+                # If the secret doesn't exist, create it
+                self.create_secret(project, name)
+
+            # Create a new secret version
+            secret = self.secret_manager_client.secret_path(
+                project,
+                name,
+            )
+
+            # Add the secret version
+            self.secret_manager_client.add_secret_version(
+                parent=secret,
+                payload=secretmanager.SecretPayload(
+                    data=private_key.encode('UTF-8')
+                )
+            )
+        except Exception as e:
+            LOG.error(f"Failed to store private key for {name}: {e}")
+            LOG.exception(e)
+            raise RuntimeError("Unable to store secret: {}".format(e)) from e
 
     def rotate_private_key(
             self: Self,
