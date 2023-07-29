@@ -2,7 +2,7 @@ from basicnanoclient.nano import BasicNanoClient
 from typing import List, Tuple, Optional, Self
 import logging
 
-from nanohelp.secret_manager import SecretManager
+from nanohelp.secret import SecretManager
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

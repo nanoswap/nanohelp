@@ -40,37 +40,29 @@ class SecretManager:
             self: Self,
             project: str,
             name: str,
-            private_key: str,
-            version: str = 'latest',
-            rotation_time: int = 60 * 60 * 24 * 30):
+            private_key: str,):
         """Storing a private key based on a index in Google Secret Manager.
 
         Params:
             - project: the project to store the secret in
             - name: the name of the secret
             - private_key: the private key to store
-            - version: the version of the secret. Defaults to 'latest'.
-            - rotation_time: the time in seconds until the secret should be rotated.
-                Defaults to 30 days. (Not enforced by Google Secret Manager)
 
         Raises:
             - RuntimeError: If unable to store the secret.
         """
         try:
             # Create a new secret version
-            secret = self.secret_manager_client.secret_version_path(
+            secret = self.secret_manager_client.secret_path(
                 project,
                 name,
-                version
             )
 
             # Add the secret version
-            self.secret_manager_client.add_secret_version_with_rotation(
-                parent=secret, payload={'key': private_key},
-                rotation_schedule=secretmanager.types.RotationSchedule(
-                    next_rotation_time={
-                        'seconds': int(time.time() + rotation_time)
-                    }
+            self.secret_manager_client.add_secret_version(
+                parent=secret,
+                payload=secretmanager.SecretPayload(
+                    data=private_key.encode('UTF-8')
                 )
             )
         except Exception as e:
