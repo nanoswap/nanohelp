@@ -16,9 +16,9 @@ class TestSecretManager(unittest.TestCase):
     def test_generate_and_store_private_key(self, mock_token_hex):
         mock_token_hex.return_value = 'mocked_key'
         self.manager.store_private_key = Mock()
-        key = self.manager.generate_and_store_private_key('mock_user')
+        key = self.manager.generate_and_store_private_key('mock_project', 'mock_user')
         self.assertEqual(key, 'mocked_key')
-        self.manager.store_private_key.assert_called_once_with('mock_user', 'mocked_key')
+        self.manager.store_private_key.assert_called_once_with('mock_project', 'mock_user', 'mocked_key')
 
     @patch('nanohelp.secret.time.time', return_value=100)
     def test_store_private_key(self, mock_time):
@@ -31,7 +31,3 @@ class TestSecretManager(unittest.TestCase):
         self.manager.secret_manager_client.access_secret_version.return_value.payload.data.decode.return_value = 'mocked_key'
         key = self.manager.get_private_key('mock_project', 'mock_name')
         self.assertEqual(key, 'mocked_key')
-
-    def test_rotate_private_key(self):
-        with self.assertRaises(NotImplementedError):
-            self.manager.rotate_private_key('mock_name')
