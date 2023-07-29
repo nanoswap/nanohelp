@@ -1,5 +1,5 @@
 requests
 setuptools
 py-multicodec
-
+google-cloud-secret-manager
 basicnanoclient

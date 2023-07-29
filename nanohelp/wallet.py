@@ -2,6 +2,8 @@ from basicnanoclient.nano import BasicNanoClient
 from typing import List, Tuple, Optional, Self
 import logging
 
+from nanohelp.secret_manager import SecretManager
+
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -14,30 +16,37 @@ class WalletManager:
     """
     def __init__(
             self: Self,
+            secret_manager: SecretManager,
             node_address: str = "http://127.0.0.1:17076") -> None:
         """Initialize the wallet manager.
 
         Params:
             - node_address: the address of the node to connect to.
                 Defaults to the local node at port 17076.
+
         """
         self.client = BasicNanoClient(node_address)
+        self.secret_manager = secret_manager
 
-    def create_wallet(self: Self) -> Optional[Tuple[str, str, str]]:
-        """Create a new wallet.
+    def create_wallet(self: Self, name: str) -> Optional[Tuple[str, str]]:
+        """Generate a new private key and create a new wallet.
 
-        Returns: a tuple containing wallet_id, account_address and private_key
+        Params:
+            - name: the name of the wallet to create
+
+        Returns: a tuple containing wallet_id and account_address
         """
         try:
-            private_key = self.client.generate_private_key()
-            wallet_id = self.client.wallet_create(private_key)['wallet']
+            wallet_id = self.client.wallet_create(
+                self.secret_manager.generate_and_store_private_key(name)
+            )['wallet']
             account_address = self.client.accounts_create(wallet_id)['accounts'][0]
         except Exception as e:
             LOG.error(f"Failed to create wallet: {e}")
             LOG.exception(e)
             return None
 
-        return wallet_id, account_address, private_key
+        return wallet_id, account_address
 
     def add_account_to_wallet(self: Self, wallet_id: str) -> Optional[str]:
         """Add a new account to an existing wallet.
