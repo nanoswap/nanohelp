@@ -40,10 +40,17 @@ class WalletManager:
         Returns: a tuple containing wallet_id and account_address
         """
         try:
-            wallet_id = self.client.wallet_create(
+            # Generate a new private key and store it in Google Secret Manager
+            wallet_create_response = self.client.wallet_create(
                 self.secret_manager.generate_and_store_private_key(project, name)
-            )['wallet']
-            account_address = self.client.accounts_create(wallet_id)['accounts'][0]
+            )
+            LOG.debug(f"Created wallet {name}: {wallet_create_response}")
+            wallet_id = wallet_create_response['wallet']
+
+            # Create a new account in the wallet
+            account_address_response = self.client.accounts_create(wallet_id)
+            LOG.debug(f"Created account: {account_address_response}")
+            account_address = account_address_response['accounts'][0]
         except Exception as e:
             LOG.error(f"Failed to create wallet: {e}")
             LOG.exception(e)
